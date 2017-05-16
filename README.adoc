@@ -1,0 +1,67 @@
+== Spring Boot Introduction (conference format)
+
+This is the sample app used during an introduction to Spring Boot (conference format,
+~ 50min).
+
+We start from scratch and generate a secured web application that exposes a domain object
+(`Speaker`) as a REST endpoint.
+
+NOTE: You can bootstrap a simple web-based project at https://start.spring.io
+
+=== Running the app locally
+
+There are many ways to start your Spring Boot app locally:
+
+* Run the `main` method in `DemoApplication` right from your IDE
+* On the command-line, execute `mvn spring-boot:run`
+* Package the project (`mvn package`) and _just_ execute the jar, that is
+`java -jar target/spring-boot-intro-conference-0.0.1-SNAPSHOT.jar`
+
+The H2 database has some default speakers created via `import.sql`. You can use curl to
+add more; to create a new `Speaker`, just _POST_ the following document to your local
+repository:
+
+```json
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "twitter": "yourTwitterAccountHere",
+  "github": "youtGithubAccountHere",
+  "bio": "John Smith's bio."
+}
+```
+
+something like:
+
+```
+$ curl http://user:user@localhost:8080/speakers -i -H "Content-type: application/json" -d @yourfile.json`
+```
+
+where `yourfile.json` is the name of the file holding the new Speaker representation.
+
+NOTE: Cross-Site Request Forgery support should be disabled locally for the command above
+to work, adding `.and().csrf().disable()` should do the trick. Also, `user/user` is the
+user that is created in the `SecurityConfig` class.
+
+=== Running the app in the cloud
+
+If you want to run that exact same app in the cloud, you need first an account with a
+cloud provider. At the time of writing, you can try _Pivotal Web Services_ for free for
+60 days, check `https://run.pivotal.io/`
+
+Once you've registered, you should be able to use `cf t` to confirm you are connected to
+the right organization and space.
+
+Pushing your app to the cloud should be as easy as:
+
+* Build your app: `mvn package`
+* Go in the `target` directory
+* Push the app: `cf push my-spring-boot-demo -p spring-boot-intro-conference-0.0.1-SNAPSHOT.jar`
+
+NOTE: `my-spring-boot-demo` is the name of your app and will also be used for the default
+route of your app (i.e. `my-spring-boot-demo.cfapps.io`). If that name is taken, update
+the `cf push` command accordingly.
+
+That's it, your app is in the cloud. You can now send a sample _json_ representation of a
+speaker on the service's URL. You can also use `cf logs my-spring-boot-demo` to look at
+the logs of the app.
